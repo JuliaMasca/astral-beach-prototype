@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Astral Beach Sports — Protótipo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep:     #F6FAFD;  /* fundo principal, off-white levemente azulado */
+  --bg-surface:  #FFFFFF;  /* cards brancos */
+  --bg-elevated: #EBF3FA;  /* hover / surfaces elevadas */
+  --bg-card:     #FFFFFF;
+  --sand:        #1B6AA5;  /* AZUL ASTRAL — cor primária dos botões e ações */
+  --sand-dim:    #4F8DBC;
+  --sand-soft:   rgba(27, 106, 165, 0.10);
+  --blue-beach:  #5FA8D3;  /* azul-palmeira — accent secundário */
+  --blue-soft:   rgba(95, 168, 211, 0.15);
+  --text-main:   #0E4D7E;  /* azul-escuro profundo, igual o gradient do logo */
+  --text-dim:    #5A7A95;
+  --text-faint:  #9AB2C4;
+  --success:     #3FA065;
+  --success-soft:rgba(63, 160, 101, 0.12);
+  --danger:      #E55B3B;
+  --danger-soft: rgba(229, 91, 59, 0.12);
+  --bronze:      #B86B3A;
+  --prata:       #6E8499;
+  --ouro:        #B8881F;  /* AMARELO GAIVOTA escurecido p/ leitura no fundo claro */
+  --platina:     #1F6D9B;
+  --diamante:    #0E8FA1;  /* turquesa-cristal — o topo da hierarquia */
+  --border:      #DCE6EF;
+  --border-hover:#A8BDD0;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--bg-deep);
+  color: var(--text-main);
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+body {
+  background:
+    radial-gradient(ellipse at top right, rgba(95, 168, 211, 0.10), transparent 55%),
+    radial-gradient(ellipse at bottom left, rgba(232, 181, 71, 0.06), transparent 55%),
+    var(--bg-deep);
+}
+
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+
+/* ========== SCREEN SWITCHER (só do protótipo) ========== */
+.proto-bar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 16px;
+  display: flex; align-items: center; gap: 8px;
+  flex-wrap: wrap;
+}
+.proto-bar .label {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--text-faint); font-weight: 700;
+  margin-right: 4px;
+}
+.proto-bar .tabs { display: flex; gap: 4px; }
+.proto-bar .tabs button {
+  padding: 6px 12px; border-radius: 999px;
+  font-size: 13px; font-weight: 500; color: var(--text-dim);
+  transition: all 0.15s ease;
+}
+.proto-bar .tabs button:hover { color: var(--text-main); background: var(--sand-soft); }
+.proto-bar .tabs button.active {
+  background: var(--sand); color: var(--bg-deep); font-weight: 700;
+}
+.proto-bar .role-toggle {
+  margin-left: auto; display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--text-dim);
+}
+.proto-bar .role-toggle button {
+  padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--border); font-size: 12px;
+}
+.proto-bar .role-toggle button.active {
+  background: var(--blue-soft); border-color: var(--blue-beach); color: var(--blue-beach);
+}
+
+/* ========== SCREENS ========== */
+.screen { display: none; padding: 24px 16px 48px; max-width: 720px; margin: 0 auto; min-height: calc(100vh - 60px); }
+.screen.active { display: block; }
+
+/* ========== LOGIN ========== */
+#screen-login {
+  display: none;
+  max-width: 100%; padding: 0;
+}
+#screen-login.active { display: flex; }
+#screen-login {
+  flex-direction: column; align-items: center; justify-content: center;
+  min-height: calc(100vh - 60px);
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(95, 168, 211, 0.30), transparent 60%),
+    radial-gradient(ellipse at 70% 80%, rgba(232, 181, 71, 0.18), transparent 60%),
+    var(--bg-deep);
+  text-align: center; padding: 32px;
+}
+.login-logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800; font-size: 52px; line-height: 1;
+  letter-spacing: -0.03em;
+  background: linear-gradient(180deg, #5FA8D3 0%, #1B6AA5 55%, #0E4D7E 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 4px;
+  display: inline-block;
+}
+.login-logo-sub {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700; font-size: 11px;
+  letter-spacing: 0.32em; text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 28px;
+}
+.login-tagline { color: var(--text-main); font-size: 18px; font-weight: 500; margin-bottom: 6px; }
+.login-sub { color: var(--text-dim); font-size: 14px; margin-bottom: 44px; }
+.btn-google {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--bg-surface); color: var(--text-main);
+  padding: 14px 28px; border-radius: 12px;
+  font-weight: 700; font-size: 15px;
+  transition: all 0.15s ease;
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 24px rgba(27, 106, 165, 0.10);
+}
+.btn-google:hover {
+  background: var(--bg-elevated);
+  border-color: var(--sand-dim);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 32px rgba(27, 106, 165, 0.15);
+}
+.btn-google svg { width: 20px; height: 20px; }
+.login-foot {
+  margin-top: 64px; color: var(--text-faint); font-size: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.login-foot .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--text-faint); }
+
+/* ========== HEADER (Home / Detalhe / Admin) ========== */
+.app-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 28px;
+}
+.app-header .user {
+  display: flex; align-items: center; gap: 10px;
+}
+.app-header .user-name { font-weight: 700; font-size: 15px; }
+.app-header .user-sub { font-size: 11px; color: var(--text-dim); display: flex; align-items: center; gap: 4px; }
+.app-header .logo {
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px;
+  background: linear-gradient(180deg, #5FA8D3 0%, #1B6AA5 60%, #0E4D7E 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  letter-spacing: -0.02em; line-height: 1;
+}
+
+/* Avatar */
+.avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 13px;
+  color: white; flex-shrink: 0;
+  border: 1.5px solid rgba(255,255,255,0.1);
+}
+.avatar.sm { width: 28px; height: 28px; font-size: 11px; }
+.avatar.lg { width: 44px; height: 44px; font-size: 15px; }
+
+/* ========== WEEK NAV ========== */
+.week-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 14px; padding: 12px 16px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(14, 77, 126, 0.04);
+}
+.week-nav .center { text-align: center; flex: 1; }
+.week-nav .center .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); font-weight: 700; }
+.week-nav .center .range { font-weight: 700; font-size: 15px; margin-top: 2px; }
+.week-nav button {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--bg-elevated); color: var(--sand);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 16px;
+}
+.week-nav button:hover { background: var(--blue-soft); color: var(--blue-beach); }
+
+/* ========== DAY STRIP (calendário rápido) ========== */
+.day-strip {
+  display: flex; gap: 8px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+.day-strip::-webkit-scrollbar { display: none; }
+.day-chip {
+  flex-shrink: 0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 14px;
+  text-align: center;
+  cursor: pointer;
+  min-width: 64px;
+  transition: all 0.15s ease;
+  position: relative;
+  box-shadow: 0 2px 6px rgba(14, 77, 126, 0.04);
+}
+.day-chip:hover {
+  border-color: var(--sand-dim);
+  transform: translateY(-1px);
+}
+.day-chip.active {
+  background: var(--sand);
+  border-color: var(--sand);
+  box-shadow: 0 6px 16px rgba(27, 106, 165, 0.25);
+}
+.day-chip .day-short {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;
+  font-weight: 700; color: var(--text-dim);
+}
+.day-chip.active .day-short { color: rgba(255,255,255,0.85); }
+.day-chip .day-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 18px; font-weight: 500;
+  color: var(--text-main); margin-top: 2px; line-height: 1;
+}
+.day-chip.active .day-num { color: white; }
+.day-chip.today::after {
+  content: ''; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%);
+  width: 5px; height: 5px; border-radius: 50%; background: var(--blue-beach);
+}
+.day-chip.active.today::after { background: white; }
+.day-chip .day-empty {
+  font-size: 9px; color: var(--text-faint); margin-top: 2px;
+  font-weight: 500;
+}
+.day-chip.active .day-empty { color: rgba(255,255,255,0.6); }
+.day-chip.all { border-style: dashed; border-color: var(--sand-dim); }
+.day-chip.all .day-short { color: var(--sand); }
+.day-chip.all .day-num { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; color: var(--sand); }
+.day-chip.all.active .day-short, .day-chip.all.active .day-num { color: white; }
+
+
+/* ========== DAY GROUP ========== */
+.day-group { margin-bottom: 32px; }
+.day-header {
+  display: flex; align-items: baseline; gap: 12px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.day-header .day-name {
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px;
+  text-transform: lowercase; letter-spacing: -0.01em;
+}
+.day-header .day-name.today {
+  color: var(--blue-beach);
+}
+.day-header .day-date {
+  font-family: 'DM Mono', monospace; font-size: 12px;
+  color: var(--text-dim);
+}
+.day-header .today-badge {
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+  background: var(--blue-soft); color: var(--blue-beach);
+  padding: 3px 8px; border-radius: 999px;
+}
+
+/* ========== CLASS CARD ========== */
+.class-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative; overflow: hidden;
+  box-shadow: 0 2px 6px rgba(14, 77, 126, 0.04);
+}
+.class-card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(14, 77, 126, 0.10);
+}
+.class-card.full { opacity: 0.85; }
+.class-card.joined::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px; background: var(--blue-beach);
+}
+
+.class-card-top {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 14px; gap: 12px;
+}
+.class-card .hora {
+  font-family: 'DM Mono', monospace;
+  font-size: 28px; font-weight: 500;
+  color: var(--text-main); line-height: 1;
+  letter-spacing: -0.02em;
+}
+.class-card .hora-sub { font-size: 11px; color: var(--text-faint); margin-top: 4px; }
+
+.tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border-radius: 999px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+}
+.tag.bronze   { background: rgba(184, 107, 58, 0.14);  color: var(--bronze); }
+.tag.prata    { background: rgba(110, 132, 153, 0.14); color: var(--prata); }
+.tag.ouro     { background: rgba(232, 181, 71, 0.20);  color: var(--ouro); }
+.tag.platina  { background: rgba(31, 109, 155, 0.14);  color: var(--platina); }
+.tag.diamante { background: rgba(14, 143, 161, 0.16);  color: var(--diamante); }
+
+.class-card-mid {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 14px;
+}
+.vagas-counter {
+  font-family: 'DM Mono', monospace; font-weight: 500; font-size: 13px;
+}
+.vagas-counter.aberta { color: var(--success); }
+.vagas-counter.lotada { color: var(--danger); }
+.vagas-bar {
+  flex: 1; height: 4px; background: var(--bg-elevated); border-radius: 2px; overflow: hidden;
+}
+.vagas-bar .fill { height: 100%; background: var(--success); transition: width 0.3s ease; }
+.vagas-bar .fill.full { background: var(--danger); }
+
+.mini-avatars {
+  display: flex; align-items: center;
+  margin-bottom: 14px;
+  min-height: 28px;
+}
+.mini-avatars .avatar { margin-left: -8px; border: 2px solid var(--bg-card); }
+.mini-avatars .avatar:first-child { margin-left: 0; }
+.mini-avatars .more {
+  font-size: 11px; color: var(--text-dim); margin-left: 8px; font-weight: 500;
+}
+.mini-avatars .empty {
+  font-size: 12px; color: var(--text-faint); font-style: italic;
+}
+
+.class-card-bottom { display: flex; align-items: center; gap: 8px; }
+.btn-action {
+  flex: 1; padding: 10px 16px; border-radius: 10px;
+  font-weight: 700; font-size: 13px;
+  transition: all 0.15s ease;
+}
+.btn-action.primary {
+  background: var(--sand); color: var(--bg-deep);
+}
+.btn-action.primary:hover { background: #f0deb5; }
+.btn-action.secondary {
+  background: var(--bg-deep); color: var(--sand);
+  border: 1px solid var(--sand-dim);
+}
+.btn-action.secondary:hover { background: var(--sand-soft); }
+.btn-action.danger {
+  background: transparent; color: var(--danger);
+  border: 1px solid var(--danger);
+}
+.btn-action.danger:hover { background: var(--danger-soft); }
+.btn-action.disabled {
+  background: var(--bg-deep); color: var(--text-faint);
+  border: 1px solid var(--border); cursor: not-allowed;
+}
+
+/* ========== DETAIL SCREEN ========== */
+.back-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--text-dim); font-size: 13px; font-weight: 500;
+  margin-bottom: 20px;
+}
+.back-btn:hover { color: var(--sand); }
+
+.detail-hero {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 24px;
+  position: relative; overflow: hidden;
+  box-shadow: 0 4px 16px rgba(14, 77, 126, 0.06);
+}
+.detail-hero::before {
+  content: ''; position: absolute; top: -40px; right: -40px;
+  width: 160px; height: 160px; border-radius: 50%;
+  background: radial-gradient(circle, var(--blue-soft), transparent 70%);
+}
+.detail-hero .row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; position: relative; }
+.detail-hero .hora-big {
+  font-family: 'DM Mono', monospace; font-size: 56px; font-weight: 500;
+  line-height: 1; letter-spacing: -0.03em;
+  background: linear-gradient(135deg, var(--blue-beach), var(--text-main));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.detail-hero .date-line {
+  color: var(--text-dim); font-size: 14px;
+  font-family: 'DM Mono', monospace;
+}
+.detail-hero .progress {
+  margin-top: 18px;
+  display: flex; align-items: center; gap: 10px;
+}
+
+.section-title {
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--text-dim);
+  margin-bottom: 12px; margin-top: 24px;
+}
+.section-title .count {
+  font-family: 'DM Mono', monospace;
+  background: var(--sand-soft); color: var(--sand);
+  padding: 2px 8px; border-radius: 999px; font-size: 11px;
+  margin-left: 8px; letter-spacing: 0;
+}
+
+.seat-list { display: flex; flex-direction: column; gap: 6px; }
+.seat-row {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+.seat-row.empty {
+  border-style: dashed; border-color: var(--text-faint);
+  color: var(--text-faint); font-style: italic;
+}
+.seat-row.me {
+  border-color: var(--blue-beach); background: var(--blue-soft);
+}
+.seat-row .num {
+  font-family: 'DM Mono', monospace; font-weight: 500;
+  width: 22px; color: var(--text-faint); font-size: 13px;
+}
+.seat-row .nome { flex: 1; font-weight: 500; }
+.seat-row .joined-at { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-faint); }
+.seat-row.waiting .num { color: var(--ouro); }
+
+.action-bar {
+  position: sticky; bottom: 16px;
+  margin-top: 32px; padding: 14px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(14, 77, 126, 0.18);
+}
+.action-bar .btn-action { width: 100%; padding: 14px; font-size: 15px; }
+
+/* ========== ADMIN ========== */
+.admin-section { margin-bottom: 32px; }
+.admin-section-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.admin-section-head h2 {
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 20px;
+  letter-spacing: -0.01em;
+}
+.admin-section-head .desc { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+.admin-section-head .actions { display: flex; gap: 8px; }
+.btn-mini {
+  font-size: 12px; font-weight: 700; padding: 8px 14px;
+  border-radius: 10px; background: var(--bg-elevated); color: var(--sand);
+  border: 1px solid var(--border);
+}
+.btn-mini:hover { background: var(--sand-soft); border-color: var(--sand-dim); }
+.btn-mini.primary { background: var(--blue-beach); color: var(--bg-deep); border-color: var(--blue-beach); }
+.btn-mini.primary:hover { background: #5BB8E0; }
+
+.template-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(14, 77, 126, 0.04);
+}
+.template-card .day-label {
+  font-family: 'Syne', sans-serif; font-weight: 700;
+  font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--blue-beach); margin-bottom: 12px;
+}
+.slot-row {
+  display: grid; grid-template-columns: 70px 1fr 64px 28px;
+  gap: 8px; align-items: center;
+  padding: 8px 0;
+  border-top: 1px solid var(--border);
+}
+.slot-row:first-of-type { border-top: none; }
+.slot-row input, .slot-row select {
+  background: var(--bg-elevated); color: var(--text-main);
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 10px; font-family: inherit; font-size: 13px;
+  width: 100%;
+}
+.slot-row input:focus, .slot-row select:focus {
+  outline: none; border-color: var(--blue-beach);
+}
+.slot-row .hora-input { font-family: 'DM Mono', monospace; font-weight: 500; }
+.slot-row .remove {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: var(--danger-soft); color: var(--danger);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 14px;
+}
+.slot-row .remove:hover { background: var(--danger); color: white; }
+.add-slot {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 10px; padding: 6px 12px;
+  font-size: 12px; font-weight: 700; color: var(--sand);
+  border: 1px dashed var(--sand-dim); border-radius: 8px;
+}
+.add-slot:hover { background: var(--sand-soft); }
+
+.alunos-table {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: 14px; overflow: hidden;
+  box-shadow: 0 2px 8px rgba(14, 77, 126, 0.04);
+}
+.aluno-row {
+  display: grid; grid-template-columns: 1fr 110px 110px;
+  gap: 12px; align-items: center;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+}
+.aluno-row:first-child { border-top: none; }
+.aluno-row .nome-cell { display: flex; align-items: center; gap: 10px; font-weight: 500; }
+.aluno-row select {
+  background: var(--bg-elevated); color: var(--text-main);
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 6px 8px; font-family: inherit; font-size: 12px;
+  width: 100%;
+}
+
+/* ========== TOAST ========== */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+  background: var(--text-main); color: #fff;
+  border: 1px solid var(--text-main);
+  border-radius: 12px; padding: 12px 20px;
+  font-size: 13px; font-weight: 500;
+  box-shadow: 0 12px 40px rgba(14, 77, 126, 0.30);
+  opacity: 0; transition: all 0.3s ease;
+  z-index: 200;
+}
+.toast.success { background: var(--success); border-color: var(--success); color: #fff; }
+.toast.danger  { background: var(--danger);  border-color: var(--danger);  color: #fff; }
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 540px) {
+  .login-logo { font-size: 36px; }
+  .detail-hero .hora-big { font-size: 44px; }
+  .aluno-row { grid-template-columns: 1fr 90px; }
+  .aluno-row .role-cell { display: none; }
+  .proto-bar { padding: 8px; }
+  .proto-bar .label { display: none; }
+  .proto-bar .tabs button { padding: 5px 10px; font-size: 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ========== PROTÓTIPO TAB BAR (não vai existir no app real) ========== -->
+<nav class="proto-bar">
+  <span class="label">Protótipo · Telas:</span>
+  <div class="tabs">
+    <button data-screen="login">Login</button>
+    <button data-screen="home" class="active">Home</button>
+    <button data-screen="aula">Detalhe</button>
+    <button data-screen="admin">Admin</button>
+  </div>
+  <div class="role-toggle">
+    <span>Ver como:</span>
+    <button data-role="aluno" class="active">Aluno</button>
+    <button data-role="professor">Professor</button>
+  </div>
+</nav>
+
+<!-- ========== LOGIN ========== -->
+<main id="screen-login" class="screen">
+  <div class="login-logo">Astral</div>
+  <div class="login-logo-sub">Beach Sports</div>
+  <p class="login-tagline">Reserve sua aula de futvôlei.</p>
+  <p class="login-sub">Sem grupo de WhatsApp, sem confusão.</p>
+
+  <button class="btn-google" onclick="showScreen('home'); showToast('Bem-vinda, Juli!', 'success')">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+    </svg>
+    Entrar com Google
+  </button>
+
+  <div class="login-foot">
+    <span>v0.1 · protótipo</span>
+    <span class="dot"></span>
+    <span>Astral Beach Sports © 2026</span>
+  </div>
+</main>
+
+<!-- ========== HOME ========== -->
+<main id="screen-home" class="screen active">
+  <header class="app-header">
+    <div class="user">
+      <div class="avatar lg" style="background: linear-gradient(135deg, #5FA8D3, #1B6AA5)">JM</div>
+      <div>
+        <div class="user-name">Juli M.</div>
+        <div class="user-sub"><span class="tag platina" style="padding: 1px 6px; font-size: 9px">Platina</span></div>
+      </div>
+    </div>
+    <div class="logo">Astral</div>
+  </header>
+
+  <div class="week-nav">
+    <button onclick="showToast('Semana anterior')">‹</button>
+    <div class="center">
+      <div class="label">Esta semana</div>
+      <div class="range">18 — 24 mai · 2026</div>
+    </div>
+    <button onclick="showToast('Próxima semana')">›</button>
+  </div>
+
+  <div class="day-strip" id="day-strip"></div>
+
+  <div id="days-container"></div>
+
+</main>
+
+<!-- ========== DETALHE DA AULA ========== -->
+<main id="screen-aula" class="screen">
+  <button class="back-btn" onclick="showScreen('home')">‹ Voltar para a semana</button>
+
+  <div class="detail-hero">
+    <div class="row">
+      <span class="tag platina">Platina</span>
+      <span style="color: var(--text-dim); font-size: 12px; font-family: 'DM Mono', monospace">terça · 19 mai</span>
+    </div>
+    <div class="hora-big">17:00</div>
+    <div class="date-line">duração 1h · Quadra 1</div>
+    <div class="progress">
+      <span class="vagas-counter lotada" id="detail-counter">8/8 vagas</span>
+      <div class="vagas-bar"><div class="fill full" style="width: 100%"></div></div>
+    </div>
+  </div>
+
+  <div class="section-title">Inscritos <span class="count" id="inscritos-count">8</span></div>
+  <div class="seat-list" id="inscritos-list"></div>
+
+  <div class="section-title" id="espera-title" style="display: none;">Lista de espera <span class="count" id="espera-count">0</span></div>
+  <div class="seat-list" id="espera-list"></div>
+
+  <div class="action-bar">
+    <button class="btn-action secondary" id="detail-action-btn">Entrar na lista de espera</button>
+  </div>
+</main>
+
+<!-- ========== ADMIN ========== -->
+<main id="screen-admin" class="screen">
+  <header class="app-header">
+    <div class="user">
+      <div class="avatar lg" style="background: linear-gradient(135deg, #E8B547, #B8881F)">DI</div>
+      <div>
+        <div class="user-name">Diguinho (Prof)</div>
+        <div class="user-sub" style="color: var(--sand); font-weight: 700">PROFESSOR</div>
+      </div>
+    </div>
+    <div style="text-align: right">
+      <div class="logo">Astral</div>
+      <div style="font-family: 'DM Sans'; font-size: 9px; letter-spacing: 0.3em; color: var(--text-dim); font-weight: 700; margin-top: -2px">ADMIN</div>
+    </div>
+  </header>
+
+  <div class="admin-section">
+    <div class="admin-section-head">
+      <div>
+        <h2>Templates da semana</h2>
+        <div class="desc">As aulas são geradas automaticamente toda sexta às 06h.</div>
+      </div>
+      <div class="actions">
+        <button class="btn-mini primary" onclick="showToast('Próxima semana gerada ✓', 'success')">⚡ Gerar agora</button>
+      </div>
+    </div>
+
+    <div id="templates-container"></div>
+  </div>
+
+  <div class="admin-section">
+    <div class="admin-section-head">
+      <div>
+        <h2>Alunos</h2>
+        <div class="desc">Só o professor define o nível — o aluno só consegue se inscrever em aulas do nível dele.</div>
+      </div>
+    </div>
+    <div class="alunos-table" id="alunos-table"></div>
+  </div>
+
+</main>
+
+<div id="toast" class="toast"></div>
+
+<script>
+// ============ UTILITIES ============
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => document.querySelectorAll(sel);
+
+// Hierarquia: cada nível pode entrar em aulas do próprio nível e abaixo
+const NIVEIS = ['bronze', 'prata', 'ouro', 'platina', 'diamante'];
+const nivelIdx = (n) => NIVEIS.indexOf(n);
+const canAccessNivel = (meu, aula) => nivelIdx(meu) >= nivelIdx(aula);
+
+const ME = { uid: 'me', nome: 'Juli M.', nivel: 'platina', iniciais: 'JM', cor: 'linear-gradient(135deg, #5FA8D3, #1B6AA5)' };
+
+const AVATAR_COLORS = [
+  '#1B6AA5', '#5FA8D3', '#3A8DC1', '#0E4D7E', '#4F8DBC',
+  '#E8B547', '#B8881F', '#B86B3A', '#3FA065', '#6E8499'
+];
+
+function hashStr(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = ((h << 5) - h + str.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+function avatarFor(nome) {
+  const c1 = AVATAR_COLORS[hashStr(nome) % AVATAR_COLORS.length];
+  const c2 = AVATAR_COLORS[(hashStr(nome) + 3) % AVATAR_COLORS.length];
+  return `linear-gradient(135deg, ${c1}, ${c2})`;
+}
+function iniciais(nome) {
+  const parts = nome.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+function pessoa(nome) {
+  return { uid: nome.toLowerCase().replace(/\s+/g, '-'), nome, iniciais: iniciais(nome), cor: avatarFor(nome) };
+}
+
+// ============ DATA (mocked, baseado na lista real da terça) ============
+
+const DAYS = [
+  { key: 'seg', label: 'Segunda', date: '18 mai', dayOfWeek: 1, isToday: false },
+  { key: 'ter', label: 'Terça',   date: '19 mai', dayOfWeek: 2, isToday: true  },
+  { key: 'qua', label: 'Quarta',  date: '20 mai', dayOfWeek: 3, isToday: false },
+  { key: 'qui', label: 'Quinta',  date: '21 mai', dayOfWeek: 4, isToday: false },
+  { key: 'sex', label: 'Sexta',   date: '22 mai', dayOfWeek: 5, isToday: false },
+];
+
+let AULAS = {
+  // Segunda — só tarde
+  seg: [
+    { id: 'seg-16-platina', hora: '16:00', nivel: 'platina', max: 8, inscritos: ['Tora', 'Patrick', 'Diego'].map(pessoa), espera: [] },
+    { id: 'seg-17-ouro',    hora: '17:00', nivel: 'ouro',    max: 8, inscritos: ['Marcelão', 'Tanque', 'Paulo', 'Victor', 'Carol'].map(pessoa), espera: [] },
+    { id: 'seg-18-prata',   hora: '18:00', nivel: 'prata',   max: 8, inscritos: ['Tati', 'Flavinha', 'Bela', 'Mafe'].map(pessoa), espera: [] },
+    { id: 'seg-19-bronze',  hora: '19:00', nivel: 'bronze',  max: 6, inscritos: ['Laura Calixto', 'Jordan'].map(pessoa), espera: [] },
+  ],
+  // Terça — dia todo (LISTA REAL)
+  ter: [
+    { id: 'ter-16-platina', hora: '16:00', nivel: 'platina', max: 8, inscritos: ['Diguinho', 'Celinho', 'Drubs', 'Livia', 'Sophia', 'Bela', 'Carol', 'Diego'].map(pessoa), espera: [] },
+    { id: 'ter-16-prata',   hora: '16:00', nivel: 'prata',   max: 8, inscritos: ['Carol C.', 'Tati', 'Flavinha'].map(pessoa), espera: [] },
+    { id: 'ter-17-platina', hora: '17:00', nivel: 'platina', max: 8, inscritos: ['Patrick', 'Tora', 'Luizinho', 'Pedro S', 'Gabriel', 'Joãozin', 'Gustavo', 'Junior'].map(pessoa), espera: [] },
+    { id: 'ter-17-prata',   hora: '17:00', nivel: 'prata',   max: 8, inscritos: ['Duda', 'Rafa', 'Nati', 'Gabi'].map(pessoa), espera: [] },
+    { id: 'ter-18-prata',   hora: '18:00', nivel: 'prata',   max: 8, inscritos: ['Bruna', 'Carlinha', 'Maria Rosa', 'Helena', 'Bela G.', 'Mafe', 'Alexandre', 'Letícia'].map(pessoa), espera: [pessoa('Camila')] },
+    { id: 'ter-19-bronze',  hora: '19:00', nivel: 'bronze',  max: 6, inscritos: ['Bruna L.', 'Jordan', 'Pedro', 'Laura Calixto', 'Sophia Lambertuci'].map(pessoa), espera: [] },
+    { id: 'ter-19-ouro',    hora: '19:00', nivel: 'ouro',    max: 8, inscritos: ['Victor', 'Marcelão', 'Tanque', 'Rafa V.', 'Paulo', 'Carol O.'].map(pessoa), espera: [pessoa('Junior')] },
+    { id: 'ter-20-bronze',  hora: '20:00', nivel: 'bronze',  max: 6, inscritos: [], espera: [] },
+    { id: 'ter-20-ouro',    hora: '20:00', nivel: 'ouro',    max: 8, inscritos: [], espera: [] },
+    { id: 'ter-21-diamante',hora: '21:00', nivel: 'diamante',max: 6, inscritos: ['Diguinho', 'Celinho', 'Drubs', 'Bela'].map(pessoa), espera: [] },
+  ],
+  // Quarta — dia todo
+  qua: [
+    { id: 'qua-09-prata',   hora: '09:00', nivel: 'prata',   max: 8, inscritos: ['Helena', 'Maria Rosa', 'Carlinha'].map(pessoa), espera: [] },
+    { id: 'qua-10-ouro',    hora: '10:00', nivel: 'ouro',    max: 8, inscritos: ['Paulo', 'Victor', 'Rafa V.', 'Marcelão'].map(pessoa), espera: [] },
+    { id: 'qua-17-platina', hora: '17:00', nivel: 'platina', max: 8, inscritos: ['Drubs', 'Diego', 'Patrick', 'Gabriel', 'Junior', 'Sophia'].map(pessoa), espera: [] },
+    { id: 'qua-18-bronze',  hora: '18:00', nivel: 'bronze',  max: 6, inscritos: ['Jordan', 'Pedro'].map(pessoa), espera: [] },
+    { id: 'qua-19-ouro',    hora: '19:00', nivel: 'ouro',    max: 8, inscritos: ['Tanque', 'Carol O.', 'Victor', 'Paulo', 'Marcelão', 'Rafa V.', 'Pedro O.'].map(pessoa), espera: [] },
+  ],
+  // Quinta — dia todo
+  qui: [
+    { id: 'qui-08-platina', hora: '08:00', nivel: 'platina', max: 8, inscritos: ['Celinho', 'Diguinho', 'Bela'].map(pessoa), espera: [] },
+    { id: 'qui-09-prata',   hora: '09:00', nivel: 'prata',   max: 8, inscritos: ['Tati', 'Flavinha', 'Duda', 'Nati'].map(pessoa), espera: [] },
+    { id: 'qui-16-prata',   hora: '16:00', nivel: 'prata',   max: 8, inscritos: ['Carol C.', 'Bela G.', 'Mafe', 'Alexandre', 'Letícia', 'Carlinha'].map(pessoa), espera: [] },
+    { id: 'qui-17-platina', hora: '17:00', nivel: 'platina', max: 8, inscritos: ['Tora', 'Luizinho', 'Gustavo', 'Gabriel', 'Junior', 'Patrick', 'Drubs'].map(pessoa), espera: [] },
+    { id: 'qui-19-ouro',    hora: '19:00', nivel: 'ouro',    max: 8, inscritos: ['Victor', 'Marcelão', 'Paulo', 'Tanque', 'Rafa V.', 'Carol O.', 'Pedro O.', 'Felipe'].map(pessoa), espera: [pessoa('Cesar'), pessoa('Bruno')] },
+    { id: 'qui-20-diamante',hora: '20:00', nivel: 'diamante',max: 6, inscritos: ['Diguinho', 'Celinho', 'Drubs', 'Bela', 'Sophia'].map(pessoa), espera: [] },
+  ],
+  // Sexta — só manhã até 11h
+  sex: [
+    { id: 'sex-08-ouro',    hora: '08:00', nivel: 'ouro',    max: 8, inscritos: ['Paulo', 'Victor', 'Carol O.'].map(pessoa), espera: [] },
+    { id: 'sex-09-prata',   hora: '09:00', nivel: 'prata',   max: 8, inscritos: ['Tati', 'Helena', 'Maria Rosa', 'Mafe', 'Carlinha'].map(pessoa), espera: [] },
+    { id: 'sex-10-platina', hora: '10:00', nivel: 'platina', max: 8, inscritos: ['Diguinho', 'Celinho', 'Drubs', 'Sophia'].map(pessoa), espera: [] },
+    { id: 'sex-11-bronze',  hora: '11:00', nivel: 'bronze',  max: 6, inscritos: ['Jordan', 'Pedro', 'Laura Calixto'].map(pessoa), espera: [] },
+  ],
+};
+
+// Templates (admin)
+let TEMPLATES = {
+  seg: [
+    { hora: '16:00', nivel: 'platina', max: 8 },
+    { hora: '17:00', nivel: 'ouro',    max: 8 },
+    { hora: '18:00', nivel: 'prata',   max: 8 },
+    { hora: '19:00', nivel: 'bronze',  max: 6 },
+    { hora: '20:00', nivel: 'ouro',    max: 8 },
+  ],
+  ter: [
+    { hora: '16:00', nivel: 'platina', max: 8 },
+    { hora: '16:00', nivel: 'prata',   max: 8 },
+    { hora: '17:00', nivel: 'platina', max: 8 },
+    { hora: '17:00', nivel: 'prata',   max: 8 },
+    { hora: '18:00', nivel: 'prata',   max: 8 },
+    { hora: '19:00', nivel: 'bronze',  max: 6 },
+    { hora: '19:00', nivel: 'ouro',    max: 8 },
+    { hora: '20:00', nivel: 'bronze',  max: 6 },
+    { hora: '20:00', nivel: 'ouro',    max: 8 },
+    { hora: '21:00', nivel: 'diamante',max: 6 },
+  ],
+  qua: [
+    { hora: '09:00', nivel: 'prata',   max: 8 },
+    { hora: '10:00', nivel: 'ouro',    max: 8 },
+    { hora: '17:00', nivel: 'platina', max: 8 },
+    { hora: '18:00', nivel: 'bronze',  max: 6 },
+    { hora: '19:00', nivel: 'ouro',    max: 8 },
+  ],
+  qui: [
+    { hora: '08:00', nivel: 'platina', max: 8 },
+    { hora: '09:00', nivel: 'prata',   max: 8 },
+    { hora: '16:00', nivel: 'prata',   max: 8 },
+    { hora: '17:00', nivel: 'platina', max: 8 },
+    { hora: '19:00', nivel: 'ouro',    max: 8 },
+    { hora: '20:00', nivel: 'diamante',max: 6 },
+  ],
+  sex: [
+    { hora: '08:00', nivel: 'ouro',    max: 8 },
+    { hora: '09:00', nivel: 'prata',   max: 8 },
+    { hora: '10:00', nivel: 'platina', max: 8 },
+    { hora: '11:00', nivel: 'bronze',  max: 6 },
+  ],
+};
+
+const ALUNOS_LIST = [
+  { nome: 'Diguinho',          nivel: 'diamante', role: 'professor' },
+  { nome: 'Celinho',           nivel: 'diamante', role: 'aluno' },
+  { nome: 'Drubs',             nivel: 'diamante', role: 'aluno' },
+  { nome: 'Bela',              nivel: 'diamante', role: 'aluno' },
+  { nome: 'Patrick',           nivel: 'platina', role: 'aluno' },
+  { nome: 'Tora',              nivel: 'platina', role: 'aluno' },
+  { nome: 'Carol',             nivel: 'platina', role: 'aluno' },
+  { nome: 'Tati',              nivel: 'prata',   role: 'aluno' },
+  { nome: 'Flavinha',          nivel: 'prata',   role: 'aluno' },
+  { nome: 'Helena',            nivel: 'prata',   role: 'aluno' },
+  { nome: 'Mafe',              nivel: 'prata',   role: 'aluno' },
+  { nome: 'Victor',            nivel: 'ouro',    role: 'aluno' },
+  { nome: 'Marcelão',          nivel: 'ouro',    role: 'aluno' },
+  { nome: 'Paulo',             nivel: 'ouro',    role: 'aluno' },
+  { nome: 'Jordan',            nivel: 'bronze',  role: 'aluno' },
+  { nome: 'Laura Calixto',     nivel: 'bronze',  role: 'aluno' },
+  { nome: 'Sophia Lambertuci', nivel: 'bronze',  role: 'aluno' },
+  { nome: 'Juli M.',            nivel: 'platina', role: 'aluno' },
+];
+
+// ============ SCREEN SWITCHER ============
+function showScreen(name) {
+  $$('.screen').forEach(s => s.classList.remove('active'));
+  $('#screen-' + name).classList.add('active');
+  $$('.proto-bar .tabs button').forEach(b => b.classList.toggle('active', b.dataset.screen === name));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+$$('.proto-bar .tabs button').forEach(b => {
+  b.addEventListener('click', () => showScreen(b.dataset.screen));
+});
+
+// Role toggle: aluno NÃO vê a aba Admin. Só professor vê.
+function applyRole(role) {
+  const isProf = role === 'professor';
+  const adminTab = $$('.proto-bar .tabs button')[3];
+  adminTab.style.display = isProf ? '' : 'none';
+
+  // Header avatar/nome muda conforme o papel
+  if (isProf) {
+    showScreen('admin');
+  } else {
+    // Se estava no admin e voltou pra aluno, vai pra home
+    if ($('#screen-admin').classList.contains('active')) showScreen('home');
+  }
+}
+
+$$('.proto-bar .role-toggle button').forEach(b => {
+  b.addEventListener('click', () => {
+    $$('.proto-bar .role-toggle button').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    applyRole(b.dataset.role);
+  });
+});
+
+// Estado inicial: aluno → aba Admin escondida
+applyRole('aluno');
+
+// ============ RENDER HOME ============
+let selectedDay = null; // null = todos os dias, ou 'seg'|'ter'|'qua'|'qui'|'sex'
+
+function renderDayStrip() {
+  const strip = $('#day-strip');
+  strip.innerHTML = '';
+
+  // Chip "Todos"
+  const allChip = document.createElement('div');
+  allChip.className = 'day-chip all' + (selectedDay === null ? ' active' : '');
+  allChip.innerHTML = `<div class="day-short">Ver</div><div class="day-num">Todos</div>`;
+  allChip.onclick = () => { selectedDay = null; renderDayStrip(); renderHome(); };
+  strip.appendChild(allChip);
+
+  // Chips de cada dia
+  DAYS.forEach(day => {
+    const dayNum = day.date.split(' ')[0];
+    const aulas = AULAS[day.key] || [];
+    const empty = aulas.length === 0;
+    const chip = document.createElement('div');
+    chip.className = 'day-chip'
+      + (selectedDay === day.key ? ' active' : '')
+      + (day.isToday ? ' today' : '');
+    chip.innerHTML = `
+      <div class="day-short">${day.label.slice(0, 3)}</div>
+      <div class="day-num">${dayNum}</div>
+      ${empty ? '<div class="day-empty">sem aulas</div>' : ''}
+    `;
+    chip.onclick = () => { selectedDay = day.key; renderDayStrip(); renderHome(); };
+    strip.appendChild(chip);
+  });
+}
+
+function renderHome() {
+  const cont = $('#days-container');
+  cont.innerHTML = '';
+  const daysToShow = selectedDay
+    ? DAYS.filter(d => d.key === selectedDay)
+    : DAYS;
+  daysToShow.forEach(day => {
+    const aulas = AULAS[day.key] || [];
+    if (!aulas.length) {
+      // Se selecionou um dia sem aulas, mostra mensagem
+      if (selectedDay === day.key) {
+        const empty = document.createElement('div');
+        empty.style.cssText = 'text-align: center; padding: 48px 16px; color: var(--text-dim);';
+        empty.innerHTML = `
+          <div style="font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px; margin-bottom: 6px; color: var(--text-main)">Sem aulas em ${day.label.toLowerCase()}</div>
+          <div style="font-size: 13px">Escolha outro dia ou volte para "ver todos"</div>
+        `;
+        cont.appendChild(empty);
+      }
+      return;
+    }
+    const group = document.createElement('div');
+    group.className = 'day-group';
+    group.innerHTML = `
+      <div class="day-header">
+        <div class="day-name ${day.isToday ? 'today' : ''}">${day.label.toLowerCase()}</div>
+        <div class="day-date">${day.date}</div>
+        ${day.isToday ? '<span class="today-badge">hoje</span>' : ''}
+      </div>
+      <div class="day-classes"></div>
+    `;
+    const list = group.querySelector('.day-classes');
+    aulas.forEach(aula => list.appendChild(renderClassCard(aula)));
+    cont.appendChild(group);
+  });
+}
+
+function renderClassCard(aula) {
+  const el = document.createElement('div');
+  const taken = aula.inscritos.length;
+  const isFull = taken >= aula.max;
+  const meInscrito = aula.inscritos.some(p => p.uid === ME.uid);
+  const meEspera = aula.espera.some(p => p.uid === ME.uid);
+  el.className = 'class-card' + (isFull ? ' full' : '') + (meInscrito ? ' joined' : '');
+  el.onclick = () => openDetail(aula.id);
+
+  const avatars = aula.inscritos.slice(0, 5).map(p =>
+    `<div class="avatar sm" style="background: ${p.cor}">${p.iniciais}</div>`
+  ).join('');
+  const more = aula.inscritos.length > 5 ? `<span class="more">+${aula.inscritos.length - 5}</span>` : '';
+  const emptyAvatars = aula.inscritos.length === 0 ? '<span class="empty">sem inscritos ainda</span>' : '';
+
+  const blocked = !canAccessNivel(ME.nivel, aula.nivel);
+  let btn;
+  if (meInscrito) {
+    btn = `<button class="btn-action danger" onclick="event.stopPropagation(); leaveClass('${aula.id}')">Sair da aula</button>`;
+  } else if (meEspera) {
+    btn = `<button class="btn-action danger" onclick="event.stopPropagation(); leaveWaitlist('${aula.id}')">Sair da espera (#${aula.espera.findIndex(p => p.uid === ME.uid) + 1})</button>`;
+  } else if (blocked) {
+    btn = `<button class="btn-action disabled" onclick="event.stopPropagation(); showLevelLockToast('${aula.nivel}')">Nível ${aula.nivel}+ requerido</button>`;
+  } else if (isFull) {
+    btn = `<button class="btn-action secondary" onclick="event.stopPropagation(); joinWaitlist('${aula.id}')">Entrar na espera${aula.espera.length ? ` · ${aula.espera.length} na fila` : ''}</button>`;
+  } else {
+    btn = `<button class="btn-action primary" onclick="event.stopPropagation(); joinClass('${aula.id}')">Entrar na aula</button>`;
+  }
+
+  el.innerHTML = `
+    <div class="class-card-top">
+      <div>
+        <div class="hora">${aula.hora}</div>
+        <div class="hora-sub">1h de aula</div>
+      </div>
+      <span class="tag ${aula.nivel}">${aula.nivel}</span>
+    </div>
+    <div class="class-card-mid">
+      <span class="vagas-counter ${isFull ? 'lotada' : 'aberta'}">${taken}/${aula.max} vagas</span>
+      <div class="vagas-bar"><div class="fill ${isFull ? 'full' : ''}" style="width: ${(taken/aula.max)*100}%"></div></div>
+    </div>
+    <div class="mini-avatars">${avatars}${more}${emptyAvatars}</div>
+    <div class="class-card-bottom">${btn}</div>
+  `;
+  return el;
+}
+
+// ============ AÇÕES ============
+function findAula(id) {
+  for (const k of Object.keys(AULAS)) {
+    const a = AULAS[k].find(x => x.id === id);
+    if (a) return a;
+  }
+  return null;
+}
+
+function joinClass(id) {
+  const a = findAula(id);
+  if (!a) return;
+  if (!canAccessNivel(ME.nivel, a.nivel)) { showLevelLockToast(a.nivel); return; }
+  if (a.inscritos.length >= a.max) { showToast('Aula lotada — entre na espera', 'danger'); return; }
+  if (a.inscritos.some(p => p.uid === ME.uid)) return;
+  a.inscritos.push({ uid: ME.uid, nome: ME.nome, iniciais: ME.iniciais, cor: ME.cor, joinedAt: now() });
+  showToast(`Confirmada na aula de ${a.hora} ✓`, 'success');
+  rerender();
+}
+
+function showLevelLockToast(nivel) {
+  showToast(`Aula de ${nivel} é acima do seu nível (${ME.nivel}). Fale com o professor.`, 'danger');
+}
+
+function leaveClass(id) {
+  const a = findAula(id);
+  if (!a) return;
+  a.inscritos = a.inscritos.filter(p => p.uid !== ME.uid);
+  // promover primeiro da espera
+  if (a.espera.length > 0 && a.inscritos.length < a.max) {
+    const promo = a.espera.shift();
+    a.inscritos.push({ ...promo, joinedAt: now() });
+    showToast(`Você saiu. ${promo.nome} foi promovida da espera.`, 'success');
+  } else {
+    showToast('Você saiu da aula', 'danger');
+  }
+  rerender();
+}
+
+function joinWaitlist(id) {
+  const a = findAula(id);
+  if (!a) return;
+  if (!canAccessNivel(ME.nivel, a.nivel)) { showLevelLockToast(a.nivel); return; }
+  if (a.espera.some(p => p.uid === ME.uid)) return;
+  a.espera.push({ uid: ME.uid, nome: ME.nome, iniciais: ME.iniciais, cor: ME.cor, joinedAt: now() });
+  showToast(`Você é a ${a.espera.length}ª na fila`, 'success');
+  rerender();
+}
+
+function leaveWaitlist(id) {
+  const a = findAula(id);
+  if (!a) return;
+  a.espera = a.espera.filter(p => p.uid !== ME.uid);
+  showToast('Você saiu da lista de espera', 'danger');
+  rerender();
+}
+
+function now() {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+function rerender() {
+  renderHome();
+  if ($('#screen-aula').classList.contains('active')) renderDetail(currentAulaId);
+}
+
+// ============ DETALHE ============
+let currentAulaId = 'ter-17-platina';
+function openDetail(id) {
+  currentAulaId = id;
+  renderDetail(id);
+  showScreen('aula');
+}
+
+function renderDetail(id) {
+  const a = findAula(id);
+  if (!a) return;
+  const taken = a.inscritos.length;
+  const isFull = taken >= a.max;
+  const meInscrito = a.inscritos.some(p => p.uid === ME.uid);
+  const meEspera = a.espera.some(p => p.uid === ME.uid);
+
+  // Atualiza hero
+  const hero = $('.detail-hero');
+  const dayLabel = DAYS.find(d => id.startsWith(d.key))?.label.toLowerCase() || '';
+  const dayDate = DAYS.find(d => id.startsWith(d.key))?.date || '';
+  hero.querySelector('.row').innerHTML = `
+    <span class="tag ${a.nivel}">${a.nivel}</span>
+    <span style="color: var(--text-dim); font-size: 12px; font-family: 'DM Mono', monospace">${dayLabel} · ${dayDate}</span>
+  `;
+  hero.querySelector('.hora-big').textContent = a.hora;
+  $('#detail-counter').textContent = `${taken}/${a.max} vagas`;
+  $('#detail-counter').className = `vagas-counter ${isFull ? 'lotada' : 'aberta'}`;
+  hero.querySelector('.vagas-bar .fill').style.width = `${(taken/a.max)*100}%`;
+  hero.querySelector('.vagas-bar .fill').className = `fill ${isFull ? 'full' : ''}`;
+
+  // Lista de inscritos
+  $('#inscritos-count').textContent = taken;
+  const seatList = $('#inscritos-list');
+  seatList.innerHTML = '';
+  for (let i = 0; i < a.max; i++) {
+    const p = a.inscritos[i];
+    const row = document.createElement('div');
+    if (p) {
+      row.className = 'seat-row' + (p.uid === ME.uid ? ' me' : '');
+      row.innerHTML = `
+        <span class="num">${i + 1}</span>
+        <div class="avatar sm" style="background: ${p.cor}">${p.iniciais}</div>
+        <span class="nome">${p.nome}${p.uid === ME.uid ? ' · você' : ''}</span>
+        <span class="joined-at">${p.joinedAt || ''}</span>
+      `;
+    } else {
+      row.className = 'seat-row empty';
+      row.innerHTML = `<span class="num">${i + 1}</span><span class="nome">vaga aberta</span>`;
+    }
+    seatList.appendChild(row);
+  }
+
+  // Lista de espera
+  const esperaList = $('#espera-list');
+  esperaList.innerHTML = '';
+  if (a.espera.length > 0) {
+    $('#espera-title').style.display = '';
+    $('#espera-count').textContent = a.espera.length;
+    a.espera.forEach((p, i) => {
+      const row = document.createElement('div');
+      row.className = 'seat-row waiting' + (p.uid === ME.uid ? ' me' : '');
+      row.innerHTML = `
+        <span class="num">${i + 1}</span>
+        <div class="avatar sm" style="background: ${p.cor}">${p.iniciais}</div>
+        <span class="nome">${p.nome}${p.uid === ME.uid ? ' · você' : ''}</span>
+        <span class="joined-at">${p.joinedAt || ''}</span>
+      `;
+      esperaList.appendChild(row);
+    });
+  } else {
+    $('#espera-title').style.display = 'none';
+  }
+
+  // Botão de ação
+  const btn = $('#detail-action-btn');
+  const blocked = !canAccessNivel(ME.nivel, a.nivel);
+  if (meInscrito) {
+    btn.className = 'btn-action danger';
+    btn.textContent = 'Sair da aula';
+    btn.onclick = () => leaveClass(a.id);
+  } else if (meEspera) {
+    btn.className = 'btn-action danger';
+    btn.textContent = `Sair da lista de espera (você é o #${a.espera.findIndex(p => p.uid === ME.uid) + 1})`;
+    btn.onclick = () => leaveWaitlist(a.id);
+  } else if (blocked) {
+    btn.className = 'btn-action disabled';
+    btn.textContent = `Nível ${a.nivel}+ requerido — você é ${ME.nivel}`;
+    btn.onclick = () => showLevelLockToast(a.nivel);
+  } else if (isFull) {
+    btn.className = 'btn-action secondary';
+    btn.textContent = `Entrar na lista de espera${a.espera.length ? ` · ${a.espera.length} na fila` : ''}`;
+    btn.onclick = () => joinWaitlist(a.id);
+  } else {
+    btn.className = 'btn-action primary';
+    btn.textContent = 'Entrar na aula';
+    btn.onclick = () => joinClass(a.id);
+  }
+}
+
+// ============ ADMIN ============
+function renderAdmin() {
+  const cont = $('#templates-container');
+  cont.innerHTML = '';
+  DAYS.forEach(day => {
+    const slots = TEMPLATES[day.key] || [];
+    const card = document.createElement('div');
+    card.className = 'template-card';
+    card.innerHTML = `
+      <div class="day-label">${day.label} ${day.key === 'sex' ? '· até 11h' : day.key === 'seg' ? '· só tarde' : ''}</div>
+      <div class="slots-list"></div>
+      <button class="add-slot" onclick="addSlot('${day.key}')">+ Adicionar slot</button>
+    `;
+    const list = card.querySelector('.slots-list');
+    slots.forEach((s, i) => list.appendChild(renderSlotRow(day.key, i, s)));
+    cont.appendChild(card);
+  });
+
+  // Alunos
+  const at = $('#alunos-table');
+  at.innerHTML = '';
+  ALUNOS_LIST.forEach((a, i) => {
+    const row = document.createElement('div');
+    row.className = 'aluno-row';
+    row.innerHTML = `
+      <div class="nome-cell">
+        <div class="avatar sm" style="background: ${avatarFor(a.nome)}">${iniciais(a.nome)}</div>
+        <span>${a.nome}</span>
+      </div>
+      <div>
+        <select onchange="updateAlunoNivel(${i}, this.value)">
+          <option value="bronze"   ${a.nivel === 'bronze'   ? 'selected' : ''}>Bronze</option>
+          <option value="prata"    ${a.nivel === 'prata'    ? 'selected' : ''}>Prata</option>
+          <option value="ouro"     ${a.nivel === 'ouro'     ? 'selected' : ''}>Ouro</option>
+          <option value="platina"  ${a.nivel === 'platina'  ? 'selected' : ''}>Platina</option>
+          <option value="diamante" ${a.nivel === 'diamante' ? 'selected' : ''}>Diamante</option>
+        </select>
+      </div>
+      <div class="role-cell">
+        <select onchange="updateAlunoRole(${i}, this.value)">
+          <option value="aluno"     ${a.role === 'aluno'     ? 'selected' : ''}>Aluno</option>
+          <option value="professor" ${a.role === 'professor' ? 'selected' : ''}>Professor</option>
+        </select>
+      </div>
+    `;
+    at.appendChild(row);
+  });
+}
+
+function renderSlotRow(dayKey, idx, slot) {
+  const row = document.createElement('div');
+  row.className = 'slot-row';
+  row.innerHTML = `
+    <input class="hora-input" value="${slot.hora}" onchange="updateSlot('${dayKey}', ${idx}, 'hora', this.value)">
+    <select onchange="updateSlot('${dayKey}', ${idx}, 'nivel', this.value)">
+      <option value="bronze"   ${slot.nivel === 'bronze'   ? 'selected' : ''}>Bronze</option>
+      <option value="prata"    ${slot.nivel === 'prata'    ? 'selected' : ''}>Prata</option>
+      <option value="ouro"     ${slot.nivel === 'ouro'     ? 'selected' : ''}>Ouro</option>
+      <option value="platina"  ${slot.nivel === 'platina'  ? 'selected' : ''}>Platina</option>
+      <option value="diamante" ${slot.nivel === 'diamante' ? 'selected' : ''}>Diamante</option>
+    </select>
+    <input type="number" value="${slot.max}" min="2" max="20" onchange="updateSlot('${dayKey}', ${idx}, 'max', +this.value)">
+    <button class="remove" onclick="removeSlot('${dayKey}', ${idx})">×</button>
+  `;
+  return row;
+}
+
+function updateSlot(dayKey, idx, field, value) {
+  TEMPLATES[dayKey][idx][field] = value;
+  showToast('Template atualizado', 'success');
+}
+function addSlot(dayKey) {
+  TEMPLATES[dayKey].push({ hora: '18:00', nivel: 'prata', max: 8 });
+  renderAdmin();
+  showToast('Slot adicionado');
+}
+function removeSlot(dayKey, idx) {
+  TEMPLATES[dayKey].splice(idx, 1);
+  renderAdmin();
+  showToast('Slot removido', 'danger');
+}
+function updateAlunoNivel(idx, value) {
+  ALUNOS_LIST[idx].nivel = value;
+  showToast(`${ALUNOS_LIST[idx].nome} agora é ${value}`, 'success');
+}
+function updateAlunoRole(idx, value) {
+  ALUNOS_LIST[idx].role = value;
+  showToast(`${ALUNOS_LIST[idx].nome} → ${value}`, 'success');
+}
+
+// ============ TOAST ============
+let toastTimer;
+function showToast(msg, kind) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (kind ? ' ' + kind : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ============ INIT ============
+renderDayStrip();
+renderHome();
+renderAdmin();
+renderDetail(currentAulaId);
+
+// Expor funções globais para os onclick inline
+window.showScreen = showScreen;
+window.joinClass = joinClass;
+window.leaveClass = leaveClass;
+window.joinWaitlist = joinWaitlist;
+window.leaveWaitlist = leaveWaitlist;
+window.openDetail = openDetail;
+window.updateSlot = updateSlot;
+window.addSlot = addSlot;
+window.removeSlot = removeSlot;
+window.updateAlunoNivel = updateAlunoNivel;
+window.updateAlunoRole = updateAlunoRole;
+window.showToast = showToast;
+window.showLevelLockToast = showLevelLockToast;
+</script>
+</body>
+</html>
